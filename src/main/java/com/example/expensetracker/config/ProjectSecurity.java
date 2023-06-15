@@ -36,6 +36,7 @@ public class ProjectSecurity {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable();
     http.cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -50,7 +51,7 @@ public class ProjectSecurity {
             }
         })).addFilterBefore(new jwtValidation(), BasicAuthenticationFilter.class).
             addFilterAfter( new jwtGeneration(), BasicAuthenticationFilter.class)
-            .authorizeHttpRequests(request -> request.requestMatchers("/auth/login").permitAll())
+            .authorizeHttpRequests(request -> request.requestMatchers("/auth/login").authenticated())
             .formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());
     return http.build();
     }
