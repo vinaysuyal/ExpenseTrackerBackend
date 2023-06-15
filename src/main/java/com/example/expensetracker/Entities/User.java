@@ -18,7 +18,6 @@ public class User  {
     @Email
     @NotNull
     private String email;
-    @Size(min = 5)
-    @JsonIgnore
     private String password;
+
 }

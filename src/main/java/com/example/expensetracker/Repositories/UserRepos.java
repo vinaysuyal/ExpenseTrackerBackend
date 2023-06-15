@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface UserRepos extends CrudRepository<User, Integer> {
     List<User> findByEmail(String email);
+   User save(User user);
 }

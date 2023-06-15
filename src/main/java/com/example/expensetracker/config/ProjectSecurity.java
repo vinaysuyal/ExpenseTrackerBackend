@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,21 +22,23 @@ import java.util.Collections;
 public class ProjectSecurity {
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword.toString());
-            }
-        };
+        return new BCryptPasswordEncoder();
+//        return new PasswordEncoder() {
+//            @Override
+//            public String encode(CharSequence rawPassword) {
+//                return rawPassword.toString();
+//            }
+//
+//            @Override
+//            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+//                return rawPassword.toString().equals(encodedPassword.toString());
+//            }
+//        };
     }
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable();
     http.cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -50,7 +53,9 @@ public class ProjectSecurity {
             }
         })).addFilterBefore(new jwtValidation(), BasicAuthenticationFilter.class).
             addFilterAfter( new jwtGeneration(), BasicAuthenticationFilter.class)
-            .authorizeHttpRequests(request -> request.requestMatchers("/auth/login").permitAll())
+            .authorizeHttpRequests(request -> request
+                    .requestMatchers("/auth/login").authenticated()
+                    .requestMatchers("/auth/register").permitAll())
             .formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());
     return http.build();
     }
