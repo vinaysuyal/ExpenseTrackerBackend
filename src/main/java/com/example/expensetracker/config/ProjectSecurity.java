@@ -55,7 +55,10 @@ public class ProjectSecurity {
             addFilterAfter( new jwtGeneration(), BasicAuthenticationFilter.class)
             .authorizeHttpRequests(request -> request
                     .requestMatchers("/auth/login").authenticated()
-                    .requestMatchers("/auth/register").permitAll())
+                    .requestMatchers("/auth/register").permitAll()
+                    .requestMatchers("/transaction/add").authenticated()
+            .requestMatchers("/transaction/getExpenses").authenticated())
+
             .formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());
     return http.build();
     }
